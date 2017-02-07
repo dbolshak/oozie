@@ -66,7 +66,7 @@ public class SparkMain extends LauncherMain {
     private static final Pattern[] SPARK_JOB_IDS_PATTERNS = {
             Pattern.compile("Submitted application (application[0-9_]*)")};
     private static final String SPARK_YARN_JARS = "spark.yarn.jars";
-    private static final String SPARK_CONF = "--conf";
+    private static final String SPARK_CONF_ARG_TAG = "--conf";
 
     private String sparkYarnJar = null;
     private String sparkVersion = "1.X.X";
@@ -252,32 +252,32 @@ public class SparkMain extends LauncherMain {
             appendWithPathSeparator(PWD, executorClassPath);
             appendWithPathSeparator(PWD, driverClassPath);
 
-            sparkArgs.add(SPARK_CONF);
+            sparkArgs.add(SPARK_CONF_ARG_TAG);
             sparkArgs.add(EXECUTOR_CLASSPATH + executorClassPath.toString());
 
-            sparkArgs.add(SPARK_CONF);
+            sparkArgs.add(SPARK_CONF_ARG_TAG);
             sparkArgs.add(DRIVER_CLASSPATH + driverClassPath.toString());
         }
 
         if (actionConf.get(MAPREDUCE_JOB_TAGS) != null) {
-            sparkArgs.add(SPARK_CONF);
+            sparkArgs.add(SPARK_CONF_ARG_TAG);
             sparkArgs.add("spark.yarn.tags=" + actionConf.get(MAPREDUCE_JOB_TAGS));
         }
 
         if (!addedHiveSecurityToken) {
-            sparkArgs.add(SPARK_CONF);
+            sparkArgs.add(SPARK_CONF_ARG_TAG);
             sparkArgs.add(HIVE_SECURITY_TOKEN + "=false");
         }
         if (!addedHBaseSecurityToken) {
-            sparkArgs.add(SPARK_CONF);
+            sparkArgs.add(SPARK_CONF_ARG_TAG);
             sparkArgs.add(HBASE_SECURITY_TOKEN + "=false");
         }
         if (!addedLog4jExecutorSettings) {
-            sparkArgs.add(SPARK_CONF);
+            sparkArgs.add(SPARK_CONF_ARG_TAG);
             sparkArgs.add(EXECUTOR_EXTRA_JAVA_OPTIONS + LOG4J_CONFIGURATION_JAVA_OPTION + SPARK_LOG4J_PROPS);
         }
         if (!addedLog4jDriverSettings) {
-            sparkArgs.add(SPARK_CONF);
+            sparkArgs.add(SPARK_CONF_ARG_TAG);
             sparkArgs.add(DRIVER_EXTRA_JAVA_OPTIONS + LOG4J_CONFIGURATION_JAVA_OPTION + SPARK_LOG4J_PROPS);
         }
         File defaultConfFile = getMatchingFile(SPARK_DEFAULTS_FILE_PATTERN);
@@ -318,9 +318,19 @@ public class SparkMain extends LauncherMain {
         System.out.println("Oozie Spark action configuration");
         System.out.println("=================================================================");
         System.out.println();
-        for (String arg : sparkArgs) {
-            System.out.println("                    " + arg);
+
+        String prevArg = null;
+        for(Iterator<String> iterator = sparkArgs.iterator(); iterator.hasNext(); ) {
+            String currentArg = iterator.next();
+
+            System.out.println("                    " + currentArg);
+
+            if (SPARK_CONF_ARG_TAG.equals(prevArg) && SPARK_CONF_ARG_TAG.equals(currentArg)) {
+                iterator.remove();
+            }
+            prevArg = currentArg;
         }
+
         System.out.println();
         try {
             runSpark(sparkArgs.toArray(new String[sparkArgs.size()]));
@@ -484,7 +494,7 @@ public class SparkMain extends LauncherMain {
      */
     private void setSparkYarnJarsConf(List<String> sparkArgs) {
         // In Spark 2.X.X, set spark.yarn.jars
-        sparkArgs.add(SPARK_CONF);
+        sparkArgs.add(SPARK_CONF_ARG_TAG);
         sparkArgs.add(SPARK_YARN_JARS + "=" + sparkYarnJar);
     }
 
