@@ -65,8 +65,6 @@ public class SparkMain extends LauncherMain {
     private static final String SPARK_LOG4J_PROPS = "spark-log4j.properties";
     private static final Pattern[] SPARK_JOB_IDS_PATTERNS = {
             Pattern.compile("Submitted application (application[0-9_]*)")};
-    private static final Pattern SPARK_VERSION_1 = Pattern.compile("^1.*");
-    private static final String SPARK_YARN_JAR = "spark.yarn.jar";
     private static final String SPARK_YARN_JARS = "spark.yarn.jars";
     private static final String SPARK_CONF = "--conf";
 
