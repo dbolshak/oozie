@@ -68,6 +68,8 @@ public class SparkMain extends LauncherMain {
     private static final Pattern SPARK_VERSION_1 = Pattern.compile("^1.*");
     private static final String SPARK_YARN_JAR = "spark.yarn.jar";
     private static final String SPARK_YARN_JARS = "spark.yarn.jars";
+    private static final String SPARK_CONF = "--conf";
+
     private String sparkYarnJar = null;
     private String sparkVersion = "1.X.X";
 
@@ -252,32 +254,32 @@ public class SparkMain extends LauncherMain {
             appendWithPathSeparator(PWD, executorClassPath);
             appendWithPathSeparator(PWD, driverClassPath);
 
-            sparkArgs.add("--conf");
+            sparkArgs.add(SPARK_CONF);
             sparkArgs.add(EXECUTOR_CLASSPATH + executorClassPath.toString());
 
-            sparkArgs.add("--conf");
+            sparkArgs.add(SPARK_CONF);
             sparkArgs.add(DRIVER_CLASSPATH + driverClassPath.toString());
         }
 
         if (actionConf.get(MAPREDUCE_JOB_TAGS) != null) {
-            sparkArgs.add("--conf");
+            sparkArgs.add(SPARK_CONF);
             sparkArgs.add("spark.yarn.tags=" + actionConf.get(MAPREDUCE_JOB_TAGS));
         }
 
         if (!addedHiveSecurityToken) {
-            sparkArgs.add("--conf");
+            sparkArgs.add(SPARK_CONF);
             sparkArgs.add(HIVE_SECURITY_TOKEN + "=false");
         }
         if (!addedHBaseSecurityToken) {
-            sparkArgs.add("--conf");
+            sparkArgs.add(SPARK_CONF);
             sparkArgs.add(HBASE_SECURITY_TOKEN + "=false");
         }
         if (!addedLog4jExecutorSettings) {
-            sparkArgs.add("--conf");
+            sparkArgs.add(SPARK_CONF);
             sparkArgs.add(EXECUTOR_EXTRA_JAVA_OPTIONS + LOG4J_CONFIGURATION_JAVA_OPTION + SPARK_LOG4J_PROPS);
         }
         if (!addedLog4jDriverSettings) {
-            sparkArgs.add("--conf");
+            sparkArgs.add(SPARK_CONF);
             sparkArgs.add(DRIVER_EXTRA_JAVA_OPTIONS + LOG4J_CONFIGURATION_JAVA_OPTION + SPARK_LOG4J_PROPS);
         }
         File defaultConfFile = getMatchingFile(SPARK_DEFAULTS_FILE_PATTERN);
@@ -486,11 +488,11 @@ public class SparkMain extends LauncherMain {
         if (SPARK_VERSION_1.matcher(sparkVersion).find()) {
             // In Spark 1.X.X, set spark.yarn.jar to avoid
             // multiple distribution
-            sparkArgs.add("--conf");
+            sparkArgs.add(SPARK_CONF);
             sparkArgs.add(SPARK_YARN_JAR + "=" + sparkYarnJar);
         } else {
             // In Spark 2.X.X, set spark.yarn.jars
-            sparkArgs.add("--conf");
+            sparkArgs.add(SPARK_CONF);
             sparkArgs.add(SPARK_YARN_JARS + "=" + sparkYarnJar);
         }
     }
