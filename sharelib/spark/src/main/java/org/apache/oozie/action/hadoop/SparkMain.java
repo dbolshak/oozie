@@ -480,21 +480,14 @@ public class SparkMain extends LauncherMain {
     }
 
     /**
-     * Sets spark.yarn.jars for Spark 2.X. Sets spark.yarn.jar for Spark 1.X.
+     * Sets spark.yarn.jars for Spark 2.X.
      *
      * @param sparkArgs
      */
     private void setSparkYarnJarsConf(List<String> sparkArgs) {
-        if (SPARK_VERSION_1.matcher(sparkVersion).find()) {
-            // In Spark 1.X.X, set spark.yarn.jar to avoid
-            // multiple distribution
-            sparkArgs.add(SPARK_CONF);
-            sparkArgs.add(SPARK_YARN_JAR + "=" + sparkYarnJar);
-        } else {
-            // In Spark 2.X.X, set spark.yarn.jars
-            sparkArgs.add(SPARK_CONF);
-            sparkArgs.add(SPARK_YARN_JARS + "=" + sparkYarnJar);
-        }
+        // In Spark 2.X.X, set spark.yarn.jars
+        sparkArgs.add(SPARK_CONF);
+        sparkArgs.add(SPARK_YARN_JARS + "=" + sparkYarnJar);
     }
 
     private String getJarVersion(File jarFile) throws IOException {
