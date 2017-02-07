@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -86,7 +86,7 @@ public class SparkMain extends LauncherMain {
      * @return the options parsed into a list
      */
     static List<String> splitSparkOpts(String sparkOpts) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         StringBuilder currentWord = new StringBuilder();
         boolean insideQuote = false;
         for (int i = 0; i < sparkOpts.length(); i++) {
@@ -142,11 +142,8 @@ public class SparkMain extends LauncherMain {
         hadoopProps.setProperty("log4j.logger.org.apache.hadoop.yarn.client.api.impl.YarnClientImpl", "INFO, jobid");
 
         String localProps = new File(SPARK_LOG4J_PROPS).getAbsolutePath();
-        OutputStream os1 = new FileOutputStream(localProps);
-        try {
+        try (OutputStream os1 = new FileOutputStream(localProps)) {
             hadoopProps.store(os1, "");
-        } finally {
-            os1.close();
         }
         PropertyConfigurator.configure(SPARK_LOG4J_PROPS);
         return logFile;
@@ -161,7 +158,7 @@ public class SparkMain extends LauncherMain {
         setYarnTag(actionConf);
         LauncherMainHadoopUtils.killChildYarnJobs(actionConf);
         String logFile = setUpSparkLog4J(actionConf);
-        List<String> sparkArgs = new ArrayList<String>();
+        List<String> sparkArgs = new ArrayList<>();
 
         sparkArgs.add(MASTER_OPTION);
         String master = actionConf.get(SparkActionExecutor.SPARK_MASTER);
@@ -310,9 +307,7 @@ public class SparkMain extends LauncherMain {
         }
 
         sparkArgs.add(jarPath);
-        for (String arg : args) {
-            sparkArgs.add(arg);
-        }
+        Collections.addAll(sparkArgs, args);
         if (isPyspark) {
             createPySparkLibFolder();
         }
@@ -392,7 +387,7 @@ public class SparkMain extends LauncherMain {
      * @param fileNamePattern the pattern to look for
      * @return the file if there is one else it returns null
      */
-    private File getMatchingFile(Pattern fileNamePattern) throws OozieActionConfiguratorException {
+    private File getMatchingFile(Pattern fileNamePattern) {
         File localDir = new File(".");
         for (String fileName : localDir.list()) {
             if (fileNamePattern.matcher(fileName).find()) {
@@ -402,7 +397,7 @@ public class SparkMain extends LauncherMain {
         return null;
     }
 
-    private void runSpark(String[] args) throws Exception {
+    private void runSpark(String[] args) {
         System.out.println("=================================================================");
         System.out.println();
         System.out.println(">>> Invoking Spark class now >>>");
@@ -423,10 +418,9 @@ public class SparkMain extends LauncherMain {
         if (files == null) {
             return null;
         }
-        LinkedList<URI> listUris = new LinkedList<URI>();
+        LinkedList<URI> listUris = new LinkedList<>();
         FileSystem fs = FileSystem.get(new Configuration(true));
-        for (int i = 0; i < files.length; i++) {
-            URI fileUri = files[i];
+        for (URI fileUri : files) {
             // Spark compares URIs based on scheme, host and port.
             // Here we convert URIs into the default format so that Spark
             // won't think those belong to different file system.
@@ -456,7 +450,7 @@ public class SparkMain extends LauncherMain {
      * @return
      * @throws OozieActionConfiguratorException
      */
-    private String filterSparkYarnJar(LinkedList<URI> listUris) throws OozieActionConfiguratorException {
+    private String filterSparkYarnJar(LinkedList<URI> listUris) {
         Iterator<URI> iterator = listUris.iterator();
         File matchedFile = null;
         while (iterator.hasNext()) {
