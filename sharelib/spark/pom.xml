@@ -250,6 +250,17 @@
         </dependency>
     </dependencies>
 
+    <distributionManagement>
+        <repository>
+            <id>artifactory</id>
+            <url>${dl-shared-releases}</url>
+        </repository>
+        <snapshotRepository>
+            <id>artifactory</id>
+            <url>${dl-shared-snapshots}</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <build>
         <resources>
             <resource>
